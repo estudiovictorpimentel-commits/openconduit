@@ -17,6 +17,7 @@ import { userRoutes } from "./routes/users.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import { conversationRoutes } from "./routes/conversations.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
+import { claraRoutes } from "./routes/clara.js";
 
 
 const app = Fastify({
@@ -50,6 +51,7 @@ await app.register(authRoutes, { prefix: "/api/v1/auth" });
 await app.register(dashboardRoutes, { prefix: "/api/v1/dashboard" });
 await app.register(contactRoutes, { prefix: "/api/v1/contacts" });
 await app.register(conversationRoutes, { prefix: "/api/v1/conversations" });
+await app.register(claraRoutes, { prefix: "/api/v1/clara" });
 await app.register(messageRoutes, { prefix: "/api/v1/messages" });
 await app.register(tagRoutes, { prefix: "/api/v1/tags" });
 await app.register(pipelineRoutes, { prefix: "/api/v1/pipeline" });

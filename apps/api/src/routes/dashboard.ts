@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { startOfDay, subDays, format } from "date-fns";
+import { prisma } from "../db.js";
 
 export async function dashboardRoutes(app: FastifyInstance) {
   app.addHook("preHandler", async (request) => {
@@ -21,9 +22,9 @@ export async function dashboardRoutes(app: FastifyInstance) {
       recentConversations,
     ] = await Promise.all([
       // 1. Basic Stats
-      app.prisma.conversation.count({ where: { status: "OPEN" } }),
-      app.prisma.contact.count(),
-      app.prisma.reminder.count({
+      prisma.conversation.count({ where: { status: "OPEN" } }),
+      prisma.contact.count(),
+      prisma.reminder.count({
         where: {
           dueAt: { gte: todayStart, lt: startOfDay(subDays(todayStart, -1)) },
           completed: false,
@@ -31,27 +32,27 @@ export async function dashboardRoutes(app: FastifyInstance) {
       }),
 
       // 2. Pipeline Stats (Funnel)
-      app.prisma.pipelineStage.findMany({
+      prisma.pipelineStage.findMany({
         include: { _count: { select: { contacts: true } } },
         orderBy: { order: "asc" },
       }),
 
       // 3. Tag Stats (Top 5)
-      app.prisma.tag.findMany({
+      prisma.tag.findMany({
         include: { _count: { select: { contacts: true } } },
         orderBy: { contacts: { _count: "desc" } },
         take: 5,
       }),
 
       // 4. Message Volume (Last 7 Days)
-      app.prisma.message.groupBy({
+      prisma.message.groupBy({
         by: ["direction", "createdAt"],
         where: { createdAt: { gte: weekAgoStart } },
         _count: true,
       }),
 
       // 5. Recent Conversations
-      app.prisma.conversation.findMany({
+      prisma.conversation.findMany({
         where: { status: "OPEN" },
         take: 5,
         orderBy: { updatedAt: "desc" },
@@ -73,14 +74,14 @@ export async function dashboardRoutes(app: FastifyInstance) {
       const date = subDays(todayStart, 6 - i);
       const dateStr = format(date, "MMM dd");
       
-      const dayMessages = messageStats.filter(m => 
+      const dayMessages = messageStats.filter((m: any) =>
         startOfDay(new Date(m.createdAt)).getTime() === date.getTime()
       );
 
       return {
         name: dateStr,
-        inbound: dayMessages.filter(m => m.direction === "INBOUND").reduce((acc, m) => acc + m._count, 0),
-        outbound: dayMessages.filter(m => m.direction === "OUTBOUND").reduce((acc, m) => acc + m._count, 0),
+        inbound: dayMessages.filter((m: any) => m.direction === "INBOUND").reduce((acc: number, m: any) => acc + m._count, 0),
+        outbound: dayMessages.filter((m: any) => m.direction === "OUTBOUND").reduce((acc: number, m: any) => acc + m._count, 0),
       };
     });
 
@@ -90,16 +91,16 @@ export async function dashboardRoutes(app: FastifyInstance) {
         totalContacts,
         remindersDueToday,
       },
-      pipeline: pipelineStats.map(s => ({
+      pipeline: pipelineStats.map((s: any) => ({
         name: s.name,
         value: s._count.contacts,
       })),
-      tags: tagStats.map(t => ({
+      tags: tagStats.map((t: any) => ({
         name: t.name,
         value: t._count.contacts,
       })),
       messageVolume,
-      recentConversations: recentConversations.map(c => ({
+      recentConversations: recentConversations.map((c: any) => ({
         id: c.id,
         contactName: c.contact.name,
         phone: c.contact.phone,

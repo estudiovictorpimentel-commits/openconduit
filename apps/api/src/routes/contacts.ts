@@ -195,8 +195,8 @@ export async function contactRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(404).send({ error: "Not Found", message: "Contact not found", statusCode: 404 });
     }
 
-    const messages = contact.conversations.flatMap((c) => c.messages);
-    messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    const messages = contact.conversations.flatMap((conversation: typeof contact.conversations[number]) => conversation.messages);
+    messages.sort((a: typeof messages[number], b: typeof messages[number]) => a.createdAt.getTime() - b.createdAt.getTime());
 
     return messages;
   });

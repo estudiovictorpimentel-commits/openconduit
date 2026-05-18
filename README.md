@@ -106,8 +106,42 @@ Messages will start flowing in as soon as the webhook is registered.
 | `REDIS_URL` | Redis connection string | No (defaults to `redis://localhost:6379`) |
 | `CORS_ORIGIN` | Allowed CORS origin for development | No |
 | `PORT` | API server port | No (defaults to `3000`) |
+| `CLARA_INTEGRATION_TOKEN` | Shared token for Clara to push conversations and handoffs into the CRM via `x-clara-integration-token` | Recommended |
 
 WhatsApp provider credentials are configured through the Settings UI after deployment, not through environment variables.
+
+## Clara Integration
+
+This fork includes a Clara operator dashboard at `/clara` and two API endpoints for connecting the current Clara WhatsApp bot to the CRM:
+
+- `POST /api/v1/clara/conversations/sync` receives normal Clara conversation events, message history, service/niche context, conversation health, proposal PDF status and CRM stage.
+- `POST /api/v1/clara/handoff` receives forced handoff events and creates an open CRM conversation with the handoff reason, summary and suggested human reply.
+
+Both endpoints accept `x-clara-integration-token: <CLARA_INTEGRATION_TOKEN>`. In production, set `CLARA_INTEGRATION_TOKEN` before exposing the API.
+
+Minimal handoff payload:
+
+```json
+{
+  "phone": "+5511999999999",
+  "name": "Cliente",
+  "service": "Ensaio gestante",
+  "conversationHealth": {
+    "status": "handoff_required",
+    "signals": ["lost_context", "customer_frustration"],
+    "recoveryCount": 1
+  },
+  "proposal": {
+    "status": "missing"
+  },
+  "handoff": {
+    "required": true,
+    "reason": "missing_proposal_pdf",
+    "summary": "Cliente pediu orcamento de ensaio gestante, mas Clara nao tem PDF pronto.",
+    "suggestedReply": "Oi, aqui e a Greicy. Vi seu pedido de ensaio gestante e vou te orientar direto pelo melhor pacote."
+  }
+}
+```
 
 ## Contributing
 

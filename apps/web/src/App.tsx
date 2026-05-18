@@ -5,6 +5,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ConversationsPage } from "@/pages/ConversationsPage";
 import { ConversationDetailPage } from "@/pages/ConversationDetailPage";
+import { ClaraDashboardPage } from "@/pages/ClaraDashboardPage";
 import { ContactsPage } from "@/pages/ContactsPage";
 import { ContactDetailPage } from "@/pages/ContactDetailPage";
 import { RemindersPage } from "@/pages/RemindersPage";
@@ -39,6 +40,7 @@ export function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/clara" element={<ClaraDashboardPage />} />
                 <Route path="/conversations" element={<ConversationsPage />} />
                 <Route path="/conversations/:id" element={<ConversationDetailPage />} />
                 <Route path="/contacts" element={<ContactsPage />} />

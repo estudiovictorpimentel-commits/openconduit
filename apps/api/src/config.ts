@@ -25,4 +25,5 @@ export const config = {
   nodeEnv: optionalEnv("NODE_ENV", "development"),
   isProduction: optionalEnv("NODE_ENV", "development") === "production",
   corsOrigin: optionalEnv("CORS_ORIGIN", "http://localhost:5173"),
+  claraIntegrationToken: process.env.CLARA_INTEGRATION_TOKEN ?? "",
 } as const;

@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/react";
 import { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import {
@@ -810,7 +809,6 @@ export function App() {
         <Route path="/docs/security" element={<DocsLayout><SecurityPage /></DocsLayout>} />
         <Route path="/docs/contributing" element={<DocsLayout><ContributingPage /></DocsLayout>} />
       </Routes>
-      <Analytics />
     </>
   );
 }
