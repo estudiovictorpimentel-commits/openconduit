@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify";
+import { prisma } from "../db.js";
 import { startOfDay, subDays, format } from "date-fns";
 
 export async function dashboardRoutes(app: FastifyInstance) {
@@ -21,9 +22,9 @@ export async function dashboardRoutes(app: FastifyInstance) {
       recentConversations,
     ] = await Promise.all([
       // 1. Basic Stats
-      app.prisma.conversation.count({ where: { status: "OPEN" } }),
-      app.prisma.contact.count(),
-      app.prisma.reminder.count({
+      prisma.conversation.count({ where: { status: "OPEN" } }),
+      prisma.contact.count(),
+      prisma.reminder.count({
         where: {
           dueAt: { gte: todayStart, lt: startOfDay(subDays(todayStart, -1)) },
           completed: false,
@@ -31,27 +32,27 @@ export async function dashboardRoutes(app: FastifyInstance) {
       }),
 
       // 2. Pipeline Stats (Funnel)
-      app.prisma.pipelineStage.findMany({
+      prisma.pipelineStage.findMany({
         include: { _count: { select: { contacts: true } } },
         orderBy: { order: "asc" },
       }),
 
       // 3. Tag Stats (Top 5)
-      app.prisma.tag.findMany({
+      prisma.tag.findMany({
         include: { _count: { select: { contacts: true } } },
         orderBy: { contacts: { _count: "desc" } },
         take: 5,
       }),
 
       // 4. Message Volume (Last 7 Days)
-      app.prisma.message.groupBy({
+      prisma.message.groupBy({
         by: ["direction", "createdAt"],
         where: { createdAt: { gte: weekAgoStart } },
         _count: true,
       }),
 
       // 5. Recent Conversations
-      app.prisma.conversation.findMany({
+      prisma.conversation.findMany({
         where: { status: "OPEN" },
         take: 5,
         orderBy: { updatedAt: "desc" },
