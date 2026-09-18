@@ -25,5 +25,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "deepmerge-ts": "8.0.0",
+    "tsx": {
+      "esbuild": "0.28.2"
+    }
+  }
 }
